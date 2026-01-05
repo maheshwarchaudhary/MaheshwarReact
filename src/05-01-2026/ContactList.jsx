@@ -1,38 +1,32 @@
-//Create src/05-01-2026/ContactList.jsx
-//import and use in app.js
-//add contact, edit contact details, delete contact
-//Observe array state management with object updates
-
-// Import React and useState hook
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function ContactList() {
-
-  // contacts → array of contact objects
-  // setContacts → function to update contacts array
   const [contacts, setContacts] = useState([]);
-
-  // input → object for form fields
-  const [input, setInput] = useState({
-    name: "",
-    phone: ""
-  });
-
-  // editId → stores id of contact being edited
+  const [input, setInput] = useState({ name: "", phone: "" });
   const [editId, setEditId] = useState(null);
+  const [search, setSearch] = useState("");
 
-  // Handle input change (name & phone)
+  // Load contacts from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("contacts");
+    if (stored) setContacts(JSON.parse(stored));
+  }, []);
+
+  // Save contacts to localStorage on change
+  useEffect(() => {
+    localStorage.setItem("contacts", JSON.stringify(contacts));
+  }, [contacts]);
+
   const handleChange = (e) => {
-    setInput({
-      ...input,               // keep old values
-      [e.target.name]: e.target.value  // update changed field
-    });
+    setInput({ ...input, [e.target.name]: e.target.value });
   };
 
-  // Add or Update Contact
   const handleSubmit = () => {
+    if (!input.name.trim() || !input.phone.trim()) {
+      alert("Both name and phone are required.");
+      return;
+    }
 
-    // If editing existing contact
     if (editId !== null) {
       setContacts(
         contacts.map((contact) =>
@@ -41,78 +35,86 @@ function ContactList() {
             : contact
         )
       );
-      setEditId(null); // reset edit mode
-    } 
-    // Add new contact
-    else {
+      setEditId(null);
+    } else {
       setContacts([
         ...contacts,
         {
-          id: Date.now(),   // unique id
+          id: Date.now(),
           name: input.name,
-          phone: input.phone
-        }
+          phone: input.phone,
+        },
       ]);
     }
 
-    // Clear input fields
     setInput({ name: "", phone: "" });
   };
 
-  // Edit Contact
   const editContact = (contact) => {
-    setInput({
-      name: contact.name,
-      phone: contact.phone
-    });
+    setInput({ name: contact.name, phone: contact.phone });
     setEditId(contact.id);
   };
 
-  // Delete Contact
   const deleteContact = (id) => {
-    setContacts(
-      contacts.filter((contact) => contact.id !== id)
-    );
+    setContacts(contacts.filter((contact) => contact.id !== id));
   };
 
+  const filteredContacts = contacts.filter((contact) =>
+    contact.name.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Contact List</h2>
+    <div style={{ padding: "20px", maxWidth: "500px", margin: "auto" }}>
+      <h2>📇 Contact List</h2>
 
-      {/* Input Fields */}
+      <div style={{ marginBottom: "10px" }}>
+        <input
+          type="text"
+          name="name"
+          placeholder="Name"
+          value={input.name}
+          onChange={handleChange}
+          style={{ marginRight: "10px" }}
+        />
+        <input
+          type="text"
+          name="phone"
+          placeholder="Phone"
+          value={input.phone}
+          onChange={handleChange}
+          style={{ marginRight: "10px" }}
+        />
+        <button onClick={handleSubmit}>
+          {editId ? "Update" : "Add"}
+        </button>
+      </div>
+
       <input
         type="text"
-        name="name"
-        placeholder="Name"
-        value={input.name}
-        onChange={handleChange}
+        placeholder="🔍 Search by name"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        style={{ marginBottom: "15px", width: "100%" }}
       />
 
-      <input
-        type="text"
-        name="phone"
-        placeholder="Phone"
-        value={input.phone}
-        onChange={handleChange}
-      />
-
-      <button onClick={handleSubmit}>
-        {editId ? "Update" : "Add"}
-      </button>
-
-      {/* Contact List */}
-      <ul>
-        {contacts.map((contact) => (
-          <li key={contact.id}>
-            {contact.name} - {contact.phone}
-
-            <button onClick={() => editContact(contact)}>
-              Edit
-            </button>
-
-            <button onClick={() => deleteContact(contact.id)}>
-              Delete
-            </button>
+      <ul style={{ listStyle: "none", padding: 0 }}>
+        {filteredContacts.map((contact) => (
+          <li
+            key={contact.id}
+            style={{
+              marginBottom: "10px",
+              padding: "10px",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+            }}
+          >
+            <strong>{contact.name}</strong> - {contact.phone}
+            <div style={{ marginTop: "5px" }}>
+              <button onClick={() => editContact(contact)} style={{ marginRight: "10px" }}>
+                ✏️ Edit
+              </button>
+              <button onClick={() => deleteContact(contact.id)}>🗑️ Delete</button>
+            </div>
           </li>
         ))}
       </ul>
