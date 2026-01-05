@@ -1,12 +1,15 @@
-import  {Component} from "react";
-class GreatingClass extends Component {
+import React, { Component } from "react";
+class GreetingClass extends Component {
   render() {
     return (
-      <div>
-        <h1>Hello From Class Component</h1>
-        <p>This is my first class component in React.</p>
-      </div>
+      <>
+        <div>
+          <h1>Hello from Class component</h1>
+          <p>This is a test statement</p>
+        </div>
+      </>
     );
   }
 }
-export default GreatingClass;
+
+export default GreetingClass;

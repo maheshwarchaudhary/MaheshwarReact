@@ -1,23 +1,16 @@
-import GreatingClass from "./22-12-2025/first_class"
+// import Todolist from "./02-01-2026/Todolist";
+
+import ContactList from "./05-01-2026/ContactList";
+import React from "react";
 
 
 function App() {
-  
   return (
-    <>
-      <h1>Hello, React!</h1>
-      <br />
-
-      <input type="File" ></input>
-      <input type="Range" ></input>
-      <input type="Color" ></input>
-      <input type="Date" ></input>
-      <input type="Time" ></input>
-      <input type="calculate" ></input>
-      <br />
-      <GreatingClass />
-      
-    </>
-  )
+    // <Todolist />
+    <div>
+      <ContactList />
+    </div>
+  );
 }
-export default App
+
+export default App;
